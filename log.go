@@ -120,6 +120,7 @@ func NewLogger(depth ...int) *LocalLogger {
 
 //配置文件
 type logConfig struct {
+	CallDepth  int            `json:"callDepth"`
 	TimeFormat string         `json:"TimeFormat"`
 	Console    *consoleLogger `json:"Console,omitempty"`
 	File       *fileLogger    `json:"File,omitempty"`
@@ -362,6 +363,9 @@ func SetLogger(param ...string) error {
 			os.Exit(1)
 			return err
 		}
+	}
+	if conf.CallDepth != 0 {
+		defaultLogger.callDepth = conf.CallDepth
 	}
 	if conf.TimeFormat != "" {
 		defaultLogger.timeFormat = conf.TimeFormat
