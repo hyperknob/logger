@@ -58,6 +58,10 @@ func (f *fileLogger) Init(jsonConfig string) error {
 	if len(f.Filename) == 0 {
 		return errors.New("jsonconfig must have filename")
 	}
+	if strings.Contains(f.Filename, "{ip}") {
+		currentIp := GetCurrentIps()
+		f.Filename = strings.ReplaceAll(f.Filename, "{ip}", currentIp)
+	}
 	f.suffix = filepath.Ext(f.Filename)
 	f.fileNameOnly = strings.TrimSuffix(f.Filename, f.suffix)
 	f.MaxSize *= 1024 * 1024 // 将单位转换成MB
@@ -75,7 +79,6 @@ func (f *fileLogger) needCreateFresh(size int, day int) bool {
 	return (f.MaxLines > 0 && f.maxLinesCurLines >= f.MaxLines) ||
 		(f.MaxSize > 0 && f.maxSizeCurSize+size >= f.MaxSize) ||
 		(f.Daily && day != f.dailyOpenDate)
-
 }
 
 // WriteMsg write logger message into file.
