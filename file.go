@@ -76,7 +76,7 @@ func (f *fileLogger) Init(jsonConfig string) error {
 	_, pathErr := os.Stat(path)
 	if os.IsNotExist(pathErr) {
 		perm, err := strconv.ParseInt(f.PermitMask, 8, 64)
-		_ := os.MkdirAll(path, os.FileMode(perm))
+		err = os.MkdirAll(path, os.FileMode(perm))
 		if err != nil {
 			fmt.Println(err)
 		}
