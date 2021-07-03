@@ -20,4 +20,5 @@ func GetCurrentIps() string {
 			}
 		}
 	}
+	return ""
 }
