@@ -55,6 +55,8 @@ func (f *fileLogger) Init(jsonConfig string) error {
 	if err != nil {
 		return err
 	}
+
+	// 解析文件夹配置中特殊key
 	if len(f.Filename) == 0 {
 		return errors.New("jsonconfig must have filename")
 	}
@@ -62,6 +64,24 @@ func (f *fileLogger) Init(jsonConfig string) error {
 		currentIp := GetCurrentIps()
 		f.Filename = strings.ReplaceAll(f.Filename, "{ip}", currentIp)
 	}
+	// 分割路径
+	pathSegments := strings.Split(f.Filename, "/")
+	var path string
+	for i, pathSeg := range pathSegments {
+		if i != len(pathSegments) - 1 {
+			path = path + pathSeg + "/"
+		}
+	}
+	// 没有目录创建目录
+	_, pathErr := os.Stat(path)
+	if os.IsNotExist(pathErr) {
+		perm, err := strconv.ParseInt(f.PermitMask, 8, 64)
+		_ := os.MkdirAll(path, os.FileMode(perm))
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
 	f.suffix = filepath.Ext(f.Filename)
 	f.fileNameOnly = strings.TrimSuffix(f.Filename, f.suffix)
 	f.MaxSize *= 1024 * 1024 // 将单位转换成MB
